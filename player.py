@@ -5,6 +5,7 @@ class Player:
         self.name = name
         self.bank = bank
         self.hand = []
+        self.score = 0 # used to store how "good" hand is (after game)
 
     def add_to_hand(self, card):
         self.hand.append(card)
@@ -17,6 +18,12 @@ class Player:
 
     def get_hand(self):
         return self.hand
+
+    def get_score(self):
+        return self.score
+    
+    def set_score(self, score):
+        self.score = score
 
     def set_bank(self, bank):
         self.bank = bank

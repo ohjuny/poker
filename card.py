@@ -24,6 +24,12 @@ class Card:
         self.rank = rank.capitalize()
         self.suit = suit.capitalize()
 
+    def get_rank(self):
+        return self.rank
+
+    def get_suit(self):
+        return self.suit
+
     # Override equal to
     def __eq__(self, rhs):
         if (self.suit == rhs.suit and self.rank == rhs.rank):
