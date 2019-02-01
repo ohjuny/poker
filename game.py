@@ -14,6 +14,7 @@ class Game:
         self.deck = deck
         self.pot = 0
         self.community_cards = [] # face up cards
+        self.active_players = []
 
         # Important to shuffle the deck!
         self.deck.shuffle()
@@ -106,7 +107,7 @@ class Game:
     # Straight       : 4
     # Three of a Kind: 3
     # Two Pair       : 2
-    # One Pair       : 1
+    # Pair           : 1
     # High Card      : 0
 
     win_hands = [
@@ -117,7 +118,7 @@ class Game:
         "Straight"       : 4,
         "Three of a Kind": 3,
         "Two Pair"       : 2,
-        "One Pair"       : 1
+        "Pair"           : 1
         # "High Card"      : 0 # Not needed
     ]
 
@@ -226,21 +227,21 @@ class Game:
     # # Returns score of given 5 cards
     def calulate_score(self, cards):
         if check_straight_flush(cards):
-            return 8
+            return win_hands["Straight Flush"]
         if check_four_kind(cards):
-            return 7
+            return win_hands["Four of a Kind"]
         if check_full_house(cards):
-            return 6
+            return win_hands["Full House"]
         if check_flush(cards):
-            return 5
+            return win_hands["Flush"]
         if check_straight(cards):
-            return 4
+            return win_hands["Straight"]
         if check_three_kind(cards):
-            return 3
+            return win_hands["Three of a Kind"]
         if check_two_pair(cards):
-            return 2
+            return win_hands["Two Pair"]
         if check_pair(cards):
-            return 1
+            return win_hands["Pair"]
         # High card
         return 0
 
@@ -267,16 +268,119 @@ class Game:
         
         return highest
     
-    # Updates player.score for all players
+    # Updates player.score for all active players
     def calculate_all_scores(self):
-        for player in players:
+        for player in self.active_players:
             # Updates player.score to reflect best hand
             set_score(player, self.calculate_player_score(player))
 
-    # Checks how good a hand is
+    ###
+    ### Resolutions for every possible score
+    ###
+
+    # All functions take in list of tied players
+    # All functions return list of winners
+
+    def resolve_tied_straight_flush(self, players):
+        #
+
+    def resolve_tied_four_kind(self, players):
+        #
+
+    def resolve_tied_full_house(self, players):
+        #
+
+    def resolve_tied_flush(self, players):
+        #
+
+    def resolve_tied_straight(self, players):
+        #
+
+    def resolve_tied_three_kind(self, players):
+        #
+
+    def resolve_tied_two_pair(self, players):
+        #
+
+    def resolve_tied_pair(self, players):
+        #
+
+    def resolve_tied_high_card(self, players):
+        #
+        
+    ###
+    ###
+    ###
+
+    # Takes in list of tied players
+    # Returns list of winners (by finding best hand of each player)
+    def resolve_tied_scores(self, players):
+        # Straight Flush
+        if (tied_score == win_hands["Straight Flush"]):
+            return resolve_tied_straight_flush(players)
+        # Four of a Kind
+        else if (tied_score == win_hands["Four of a Kind"]):
+            return resolve_tied_four_kind(players)
+        # Full House
+        else if (tied_score == win_hands["Full House"]):
+            return resolve_tied_full_house(players)
+        # Flush
+        else if (tied_score == win_hands["Flush"]):
+            return resolve_tied_flush(players)
+        # Straight
+        else if (tied_score == win_hands["Straight"]):
+            return resolve_tied_straight(players)
+        # Three of a Kind
+        else if (tied_score == win_hands["Three of a Kind"]):
+            return resolve_tied_three_kind(players)
+        # Two Pair
+        else if (tied_score == win_hands["Two Pair"]):
+            return resolve_tied_two_pair(players)
+        # Pair
+        else if (tied_score == win_hands["Pair"]):
+            return resolve_tied_pair(players)
+        # High Card
+        else:
+            return resolve_tied_high_card(players)
+
+    # Returns player with the best hand
+    # Note: this functions is only called if multiple players play until the end
     def find_winner(self):
         # Updates player.score for all players
         self.calculate_all_scores()
+
+        # Rank players in descending order of score
+        ranked_players = sorted(self.active_players,
+                                key=lambda player: get_score(player), reverse = True)
+                                            # reverse = True allows descending scores
+        
+        # Determine winner(s)
+        # Check for same scores (not the same as a tie)
+        if get_score(ranked_players[0]) == get_score(ranked_players[1]):
+        # Multiple players have highest score
+            # Find index of first player not tied
+            # (therefore player and all following players lose)
+            # Don't need to check first two players (because of outer if statement)
+            # If there are only two players, the for loop below will not crash
+            tied_score = get_score(ranked_players[0])
+            lose_index = 2
+            for i in range(2, len(ranked_players)):
+                if get_score(ranked_players[i]) != tied_score:
+                    lose_index = i
+                    break
+            # Remove losers
+            ranked_players = ranked_players[:lose_index]
+
+            # Find player(s) with best hand
+            winners = resolve_tied_scores(ranked_players)
+        else:
+        # One clear winner
+            winners = [ranked_players[0]]
+        
+        # Return list of winners (list length = 1 if there is only 1 winner)
+        return winners
+
+###
 
 a = Game([Player("Alice"), Player("Bob"), Player("Charlie")])
 
