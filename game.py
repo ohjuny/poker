@@ -1,6 +1,9 @@
 from deck import *
 from player import *
 
+# To get 7C5 combinations of 7 cards
+from itertools import combinations 
+
 class Game:
     def __init__(self, players, buy_in=0, deck = Deck()):
         # players specification:
@@ -220,21 +223,49 @@ class Game:
     ### End of winning hand functions
     ###
 
-    # Returns list of best 5 cards given 7 cards + corresponding score
-    def calculate_best_hand(self, cards):
-        copy = cards.copy()
-        # Check every combination (5) of 7 cards
-
     # # Returns score of given 5 cards
-    # def calulate_score(self, cards):
-    #     #
+    def calulate_score(self, cards):
+        if check_straight_flush(cards):
+            return 8
+        if check_four_kind(cards):
+            return 7
+        if check_full_house(cards):
+            return 6
+        if check_flush(cards):
+            return 5
+        if check_straight(cards):
+            return 4
+        if check_three_kind(cards):
+            return 3
+        if check_two_pair(cards):
+            return 2
+        if check_pair(cards):
+            return 1
+        # High card
+        return 0
+
+    # Returns list of best 5 cards given 7 cards given score
+    def calculate_best_hand(self, cards, score):
+        # TO DO
+        return
 
     # Returns best score for given player
     def calculate_player_score(self, player):
         # Combine player hand with community cards
         cards = get_hand(player) + self.community_cards
-        return calculate_best_hand(cards)[1]
 
+        # Calculate every combination (5) of 7 cards
+        possible_hands = combinations(cards, 5)
+        possible_hands = [list(hand) for hand in possible_hands]
+
+        # Find highest score of possible_hands
+        highest = 0
+        for hand in possible_hands:
+            score = calulate_score(hand)
+            if score > highest:
+                highest = score
+        
+        return highest
     
     # Updates player.score for all players
     def calculate_all_scores(self):
