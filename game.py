@@ -275,7 +275,7 @@ class Game:
             set_score(player, self.calculate_player_score(player))
 
     ###
-    ### Resolutions for every possible score
+    ### Resolutions for every possible tie
     ###
 
     # All functions take in list of tied players
