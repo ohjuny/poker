@@ -309,7 +309,7 @@ class Game:
         #
         
     ###
-    ###
+    ### End of tie resolutions
     ###
 
     # Takes in list of tied players
