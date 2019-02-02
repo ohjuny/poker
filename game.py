@@ -118,8 +118,8 @@ class Game:
         "Straight"       : 4,
         "Three of a Kind": 3,
         "Two Pair"       : 2,
-        "Pair"           : 1
-        # "High Card"      : 0 # Not needed
+        "Pair"           : 1,
+        "High Card"      : 0
     ]
 
     # # Check if cards in list have same rank
@@ -243,7 +243,7 @@ class Game:
         if check_pair(cards):
             return win_hands["Pair"]
         # High card
-        return 0
+        return win_hands["High Card"]
 
     # Returns list of best 5 cards given 7 cards given score
     def calculate_best_hand(self, cards, score):
@@ -278,34 +278,81 @@ class Game:
     ### Resolutions for every possible tie
     ###
 
+    # Returns all hands of player with given score
+    # Returns a list of lists
+    def hands_with_score(self, player, score):
+        # Combine player hand with community cards
+        cards = get_hand(player) + self.community_cards
+
+        # Calculate every combination (5) of 7 cards
+        possible_hands = combinations(cards, 5)
+        possible_hands = [list(hand) for hand in possible_hands]
+
+        # Make list of hands with score = score
+        hands = []
+        for hand in possible_hands:
+            if calulate_score(hand) == score:
+                hands.append(hand)
+        
+        return hands
+
+    # Takes in list of tied players
+    # Returns list of players' hands with given score in order of players
+    # Returns list of lists
+    def players_hand_with_score(self, players, score):
+        return [hands_with_score(player, score) for player in players]
+
     # All functions take in list of tied players
-    # All functions return list of winners
+    # All functions return list of winner(s) (Player objects)
 
     def resolve_tied_straight_flush(self, players):
+        players_hands = players_hand_with_score(players, win_hands["Straight Flush"])
         #
 
     def resolve_tied_four_kind(self, players):
-        #
-
+        players_hands = players_hand_with_score(players, win_hands["Four of a Kind"])
+        best_hands = []
+        for hands in players_hands:
+            for hand in hands:
+                # There can only be one possible four of a kind in 7 cards
+                best_hands.append(hand)
+        best_ranks = []
+        for hand in best_hands:
+            # If first two are equal, they must be the Four rank
+            if hand[0] == hand[1]:
+                best_ranks.append(Cards.ranks.index(get_rank(hand[0])) + 2)
+            # If first two aren't equal, the other three must be the Four rank
+            else:
+                best_ranks.append(Cards.ranks.index(get_rank(hand[2])) + 2)
+        winning_index = best_ranks.index(max(best_ranks))
+        return [players[winning_index]]
+                
     def resolve_tied_full_house(self, players):
+        players_hands = players_hand_with_score(players, win_hands["Full House"])
         #
 
     def resolve_tied_flush(self, players):
+        players_hands = players_hand_with_score(players, win_hands["Flush"])
         #
 
     def resolve_tied_straight(self, players):
+        players_hands = players_hand_with_score(players, win_hands["Straight"])
         #
 
     def resolve_tied_three_kind(self, players):
+        players_hands = players_hand_with_score(players, win_hands["Three of a Kind"])
         #
 
     def resolve_tied_two_pair(self, players):
+        players_hands = players_hand_with_score(players, win_hands["Two Pair"])
         #
 
     def resolve_tied_pair(self, players):
+        players_hands = players_hand_with_score(players, win_hands["Pair"])
         #
 
     def resolve_tied_high_card(self, players):
+        players_hands = players_hand_with_score(players, win_hands["High Card"])
         #
         
     ###
@@ -340,8 +387,11 @@ class Game:
         else if (tied_score == win_hands["Pair"]):
             return resolve_tied_pair(players)
         # High Card
-        else:
+        else if (tied_score == win_hands["High Card"]):
             return resolve_tied_high_card(players)
+        # It should never ever ever reach here
+        else:
+            assert(false)
 
     # Returns player with the best hand
     # Note: this functions is only called if multiple players play until the end
