@@ -225,7 +225,7 @@ class Game:
     ###
 
     # # Returns score of given 5 cards
-    def calulate_score(self, cards):
+    def calculate_score(self, cards):
         if check_straight_flush(cards):
             return win_hands["Straight Flush"]
         if check_four_kind(cards):
@@ -262,7 +262,7 @@ class Game:
         # Find highest score of possible_hands
         highest = 0
         for hand in possible_hands:
-            score = calulate_score(hand)
+            score = calculate_score(hand)
             if score > highest:
                 highest = score
         
@@ -291,7 +291,7 @@ class Game:
         # Make list of hands with score = score
         hands = []
         for hand in possible_hands:
-            if calulate_score(hand) == score:
+            if calculate_score(hand) == score:
                 hands.append(hand)
         
         return hands
@@ -305,9 +305,22 @@ class Game:
     # All functions take in list of tied players
     # All functions return list of winner(s) (Player objects)
 
+    # players_hands is a list of lists (players) of lists (hands)
+
     def resolve_tied_straight_flush(self, players):
         players_hands = players_hand_with_score(players, win_hands["Straight Flush"])
-        #
+        # Checks if each player only has one corresponding hand
+        one = True
+        for p_hand in players_hands:
+            if len(p_hand) != 1:
+                one = False
+        
+        # If each player only has one hand
+        if one:
+            #
+        # At least one player has more than one hand
+        else:
+            #
 
     def resolve_tied_four_kind(self, players):
         players_hands = players_hand_with_score(players, win_hands["Four of a Kind"])
@@ -347,9 +360,49 @@ class Game:
         players_hands = players_hand_with_score(players, win_hands["Two Pair"])
         #
 
+    # Input hand is a list of RANKS (not cards)
+    # Assumes given hand contains exactly 1 pair
+    def find_pair_rank(self, hand):
+        for i in range(4):
+            if hand[i] == hand[i+1]:
+                return hand[i]
+        # Should never reach here
+        assert(False)
+
     def resolve_tied_pair(self, players):
         players_hands = players_hand_with_score(players, win_hands["Pair"])
-        #
+        # # Checks if each player only has one corresponding hand
+        # one = True
+        # for p_hands in players_hands:
+        #     if len(p_hands) != 1:
+        #         one = False
+        
+        # Extracts ranks of cards in each hand
+        extracted = []
+        for p_hands in players_hand:
+        # Player
+            temp_player = []
+            for hand in p_hands:
+            # Every hand of given player
+                # Sorts each hand from lowest highest to highest
+                temp_player.append(extract_ranks(cards).sort())
+            extracted.append(temp_player)
+        
+        # Make list of highest pair rank of each player
+        pair_ranks = []
+        for p_hands in extracted:
+            all_pairs = []
+            for hand in p_hands:
+                all_pairs.append(find_pair_rank(hand))
+            pair_ranks.append(max(all_pairs))
+        
+        highest = max(pair_ranks)
+        # If there is only one player with highest pair
+        if pair_ranks.count(highest) == 1:
+            return [players[pair_ranks.index(highest)]]
+        # If two players have the same highest pair
+        else:
+            #
 
     def resolve_tied_high_card(self, players):
         players_hands = players_hand_with_score(players, win_hands["High Card"])
